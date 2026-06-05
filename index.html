@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exercício de Leitura Musical</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7f9fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+        }
+
+        .sistema {
+            margin-bottom: 45px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e1e8ed;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .topo-sistema {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 900px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+
+        .titulo-clave {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+
+        .pontuacao-sistema {
+            font-size: 1rem;
+            font-weight: bold;
+            color: #7f8c8d;
+            background: #edf2f7;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .pentagrama-img {
+            width: 100%;
+            max-width: 900px;
+            height: auto;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .grid-notas {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            max-width: 900px;
+            padding: 10px;
+            background-color: #fafbfc;
+            border-radius: 6px;
+            gap: 8px;
+            overflow-x: auto;
+        }
+
+        .item-nota {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            min-width: 60px;
+        }
+
+        .item-nota span {
+            font-size: 0.8rem;
+            color: #7f8c8d;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
+
+        select {
+            padding: 6px 2px;
+            border: 2px solid #bdc3c7;
+            border-radius: 6px;
+            background-color: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        select:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        /* Classes de feedback */
+        .correto {
+            border-color: #2ecc71 !important;
+            background-color: #e8f8f0 !important;
+            color: #27ae60;
+            font-weight: bold;
+        }
+
+        .incorreto {
+            border-color: #e74c3c !important;
+            background-color: #fde8e7 !important;
+            color: #c0392b;
+            font-weight: bold;
+        }
+
+        /* Alerta visual para quando esquecerem de selecionar */
+        .esquecido {
+            border-color: #f1c40f !important;
+            background-color: #fef9e7 !important;
+            animation: piscar 0.5s ease-in-out 2;
+        }
+
+        @keyframes piscar {
+            50% { border-color: transparent; }
+        }
+
+        .painel-controle {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px solid #ecf0f1;
+        }
+
+        .placar-geral {
+            display: inline-block;
+            background: #2c3e50;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .placar-geral span {
+            color: #2ecc71;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            box-shadow: 0 4px 6px rgba(52, 152, 219, 0.2);
+            display: block;
+            margin: 0 auto 15px auto;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #resultado-mensagem {
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Exercício Interativo de Leitura Musical</h1>
+    <p style="text-align: center; color: #666; margin-bottom: 30px;">Selecione a nota correta abaixo de cada imagem. <strong>Nota:</strong> Você só poderá finalizar o exercício após preencher todas as opções.</p>
+
+    <div class="sistema" data-gabarito="ré,mi,si,ré,lá,fá,dó,fá,dó,mi,si">
+        <div class="topo-sistema">
+            <div class="titulo-clave">Clave de Sol - Linha 1</div>
+            <div class="pontuacao-sistema" id="ponto-s0">Pontos: --</div>
+        </div>
+        <img class="pentagrama-img" src="sol1.jpg" alt="Clave de Sol Linha 1">
+        <div class="grid-notas"></div>
+    </div>
+
+    <div class="sistema" data-gabarito="lá,dó,fá,dó,sol,si,lá,ré,fá">
+        <div class="topo-sistema">
+            <div class="titulo-clave">Clave de Sol - Linha 2</div>
+            <div class="pontuacao-sistema" id="ponto-s1">Pontos: --</div>
+        </div>
+        <img class="pentagrama-img" src="sol2.jpg" alt="Clave de Sol Linha 2">
+        <div class="grid-notas"></div>
+    </div>
+
+    <div class="sistema" data-gabarito="dó,sol,mi,dó,lá,ré,si,fá,ré,lá">
+        <div class="topo-sistema">
+            <div class="titulo-clave">Clave de Sol - Linha 3</div>
+            <div class="pontuacao-sistema" id="ponto-s2">Pontos: --</div>
+        </div>
+        <img class="pentagrama-img" src="sol3.jpg" alt="Clave de Sol Linha 3">
+        <div class="grid-notas"></div>
+    </div>
+
+    <div class="sistema" data-gabarito="ré,mi,si,ré,lá,fá,dó,fá,dó,mi">
+        <div class="topo-sistema">
+            <div class="titulo-clave">Clave de Fá - Linha 1</div>
+            <div class="pontuacao-sistema" id="ponto-s3">Pontos: --</div>
+        </div>
+        <img class="pentagrama-img" src="fa1.jpg" alt="Clave de Fá Linha 1">
+        <div class="grid-notas"></div>
+    </div>
+
+    <div class="sistema" data-gabarito="fá,lá,fá,si,sol,ré,dó,fá,lá,dó">
+        <div class="topo-sistema">
+            <div class="titulo-clave">Clave de Fá - Linha 2</div>
+            <div class="pontuacao-sistema" id="ponto-s4">Pontos: --</div>
+        </div>
+        <img class="pentagrama-img" src="fa2.jpg" alt="Clave de Fá Linha 2">
+        <div class="grid-notas"></div>
+    </div>
+
+    <div class="sistema" data-gabarito="lá,sol,mi,dó,lá,ré,si,fá,ré,si">
+        <div class="topo-sistema">
+            <div class="titulo-clave">Clave de Fá - Linha 3</div>
+            <div class="pontuacao-sistema" id="ponto-s5">Pontos: --</div>
+        </div>
+        <img class="pentagrama-img" src="fa3.jpg" alt="Clave de Fá Linha 3">
+        <div class="grid-notas"></div>
+    </div>
+
+    <div class="painel-controle">
+        <div class="placar-geral">
+            Total Geral: <span id="total-acertos">0</span> / <span id="total-questoes">59</span> 
+            (<span id="porcentagem">0%</span>)
+        </div>
+        
+        <button onclick="corrigirExercicio()">Finalizar e Ver Notas</button>
+        <div id="resultado-mensagem"></div>
+    </div>
+</div>
+
+<script>
+    const notasMusicais = ["dó", "ré", "mi", "fá", "sol", "lá", "si"];
+
+    function capitalizar(string) {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    // Inicialização dinâmica dos menus suspensos
+    document.querySelectorAll('.sistema').forEach((sistema, indexSistema) => {
+        const grid = sistema.querySelector('.grid-notas');
+        const gabarito = sistema.dataset.gabarito.split(',');
+
+        gabarito.forEach((notaCorreta, indexNota) => {
+            const itemNota = document.createElement('div');
+            itemNota.className = 'item-nota';
+
+            const label = document.createElement('span');
+            label.innerText = `Nº ${indexNota + 1}`;
+            itemNota.appendChild(label);
+
+            const select = document.createElement('select');
+            select.id = `s${indexSistema}-n${indexNota}`;
+            
+            const optDefault = document.createElement('option');
+            optDefault.value = "";
+            optDefault.innerText = "—";
+            select.appendChild(optDefault);
+
+            notasMusicais.forEach(nota => {
+                const opt = document.createElement('option');
+                opt.value = nota;
+                opt.innerText = capitalizar(nota);
+                select.appendChild(opt);
+            });
+
+            itemNota.appendChild(select);
+            grid.appendChild(itemNota);
+        });
+    });
+
+    function verificarCamposVazios() {
+        let existemVazios = false;
+
+        document.querySelectorAll('.sistema').forEach((sistema, indexSistema) => {
+            const gabarito = sistema.dataset.gabarito.split(',');
+
+            gabarito.forEach((notaCorreta, indexNota) => {
+                const select = document.getElementById(`s${indexSistema}-n${indexNota}`);
+                
+                // Limpa marcações temporárias de erro/esqueleto anteriores
+                select.classList.remove('esquecido');
+
+                if (select.value.trim() === "") {
+                    select.classList.add('esquecido');
+                    existemVazios = true;
+                }
+            });
+        });
+
+        return existemVazios;
+    }
+
+    function corrigirExercicio() {
+        const mensagemDiv = document.getElementById('resultado-mensagem');
+        
+        // ETAPA DE TRAVA: Valida se há campos em branco antes de fazer qualquer cálculo
+        if (verificarCamposVazios()) {
+            mensagemDiv.style.color = "#d35400";
+            mensagemDiv.style.backgroundColor = "#fae5d3";
+            mensagemDiv.innerText = "❌ Envio bloqueado: você não pode enviar o exercício com notas em branco! Verifique as opções marcadas em amarelo.";
+            return; // Interrompe a execução do código aqui
+        }
+
+        // Se passou pela trava, limpa o aviso de bloqueio e faz a correção
+        mensagemDiv.style.backgroundColor = "transparent";
+        let totalGeralNotas = 0;
+        let acertosGeral = 0;
+
+        document.querySelectorAll('.sistema').forEach((sistema, indexSistema) => {
+            const gabarito = sistema.dataset.gabarito.split(',');
+            let acertosDoSistema = 0;
+            let totalDoSistema = gabarito.length;
+
+            gabarito.forEach((notaCorreta, indexNota) => {
+                const select = document.getElementById(`s${indexSistema}-n${indexNota}`);
+                const valorSelecionado = select.value.toLowerCase().trim();
+
+                totalGeralNotas++;
+                select.classList.remove('correto', 'incorreto');
+
+                if (valorSelecionado === notaCorreta.toLowerCase().trim()) {
+                    select.classList.add('correto');
+                    acertosDoSistema++;
+                    acertosGeral++;
+                } else {
+                    select.classList.add('incorreto');
+                }
+            });
+
+            // Atualiza a pontuação individual deste pentagrama
+            const painelPontosSist = document.getElementById(`ponto-s${indexSistema}`);
+            painelPontosSist.innerText = `Pontos: ${acertosDoSistema} / ${totalDoSistema}`;
+            
+            if (acertosDoSistema === totalDoSistema) {
+                painelPontosSist.style.background = "#e8f8f0";
+                painelPontosSist.style.color = "#27ae60";
+            } else {
+                painelPontosSist.style.background = "#fde8e7";
+                painelPontosSist.style.color = "#c0392b";
+            }
+        });
+
+        // Atualiza o painel do Total Geral
+        document.getElementById('total-acertos').innerText = acertosGeral;
+        document.getElementById('total-questoes').innerText = totalGeralNotas;
+        
+        const porcentagemAcerto = Math.round((acertosGeral / totalGeralNotas) * 100);
+        document.getElementById('porcentagem').innerText = `${porcentagemAcerto}%`;
+
+        if (acertosGeral === totalGeralNotas) {
+            mensagemDiv.style.color = "#2ecc71";
+            mensagemDiv.innerText = "Incrível! Aproveitamento de 100%. Você domina a leitura nessas claves! 🎵🎉";
+        } else if (porcentagemAcerto >= 70) {
+            mensagemDiv.style.color = "#3498db";
+            mensagemDiv.innerText = "Bom trabalho! Você teve uma boa pontuação. Revise as marcações em vermelho para gabaritar!";
+        } else {
+            mensagemDiv.style.color = "#e74c3c";
+            mensagemDiv.innerText = "Continue praticando! Analise as notas marcadas em vermelho e tente melhorar sua pontuação.";
+        }
+    }
+</script>
+
+</body>
+</html>
